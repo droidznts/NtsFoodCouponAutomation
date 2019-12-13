@@ -4,8 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +25,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneActivity extends AppCompatActivity {
@@ -32,6 +40,8 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     ProgressBar progressBar;
     TextInputEditText editText;
     AppCompatButton buttonSignIn;
+    private FirebaseFirestore db;
+    private String documentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +49,14 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         setContentView(R.layout.activity_verification_code);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         progressBar = findViewById(R.id.progressbar);
         editText = findViewById(R.id.editTextCode);
         buttonSignIn = findViewById(R.id.buttonSignIn);
 
         String phoneNumber = getIntent().getStringExtra("phoneNumber");
+        documentId = getIntent().getStringExtra("docId");
         sendVerificationCode(phoneNumber);
 
         // save phone number
@@ -54,23 +66,44 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         editor.putString("phoneNumber", phoneNumber);
         editor.apply();
 
+        editText.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId,
+                                          KeyEvent event) {
+                if (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER
+                        || actionId == EditorInfo.IME_ACTION_DONE) {
+                    onActionPerformed();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String code = editText.getText().toString().trim();
-
-                if (code.isEmpty() || code.length() < 6) {
-
-                    editText.setError("Enter code...");
-                    editText.requestFocus();
-                    return;
-                }
-                verifyCode(code);
+                onActionPerformed();
             }
         });
 
     }
+
+    private void onActionPerformed() {
+
+        String code = editText.getText().toString().trim();
+
+        if (code.isEmpty() || code.length() < 6) {
+
+            editText.setError("Enter code...");
+            editText.requestFocus();
+            return;
+        }
+        verifyCode(code);
+    }
+
 
     private void verifyCode(String code) {
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
@@ -83,6 +116,11 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
+                            CollectionReference users = db.collection("users");
+                            Map<String, Object> userInfo = new HashMap<>();
+                            userInfo.put("uid", task.getResult().getUser().getUid());
+                            users.document(documentId).update(userInfo);
 
                             Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

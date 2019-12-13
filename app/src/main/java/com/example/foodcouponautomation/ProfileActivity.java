@@ -24,7 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         // get saved phone number
-        SharedPreferences prefs =  getApplicationContext().getSharedPreferences("USER_PREF",
+        SharedPreferences prefs = getApplicationContext().getSharedPreferences("USER_PREF",
                 Context.MODE_PRIVATE);
         phoneNumber = prefs.getString("phoneNumber", NULL);
 

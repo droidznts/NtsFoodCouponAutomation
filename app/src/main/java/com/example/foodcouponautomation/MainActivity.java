@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
         buttonContinue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              onActionPerformed();
+                onActionPerformed();
             }
         });
     }
@@ -82,9 +82,11 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             boolean isMobileNoPresent = false;
+                            String docId = "";
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.i(TAG, document.getId() + " => " + document.getData());
                                 isMobileNoPresent = true;
+                                docId = document.getId();
                             }
 
                             if (isMobileNoPresent) {
@@ -92,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                                 String phoneNumber = code + phoneNo;
                                 Intent intent = new Intent(MainActivity.this, VerifyPhoneActivity.class);
                                 intent.putExtra("phoneNumber", phoneNumber);
+                                intent.putExtra("docId", docId);
                                 startActivity(intent);
                             } else {
                                 editTextPhone.setError("Your number is not present");
