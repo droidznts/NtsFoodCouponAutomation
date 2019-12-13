@@ -42,6 +42,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
     AppCompatButton buttonSignIn;
     private FirebaseFirestore db;
     private String documentId;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +60,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         documentId = getIntent().getStringExtra("docId");
         sendVerificationCode(phoneNumber);
 
-        // save phone number
-        SharedPreferences prefs = getApplicationContext().getSharedPreferences("USER_PREF",
+        prefs = getApplicationContext().getSharedPreferences("USER_PREF",
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("phoneNumber", phoneNumber);
@@ -119,8 +119,13 @@ public class VerifyPhoneActivity extends AppCompatActivity {
 
                             CollectionReference users = db.collection("users");
                             Map<String, Object> userInfo = new HashMap<>();
-                            userInfo.put("uid", task.getResult().getUser().getUid());
+                            final String uidVal = task.getResult().getUser().getUid();
+                            userInfo.put("uid", uidVal);
                             users.document(documentId).update(userInfo);
+
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("uid", uidVal);
+                            editor.apply();
 
                             Intent intent = new Intent(VerifyPhoneActivity.this, ProfileActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
