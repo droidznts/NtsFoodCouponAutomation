@@ -17,6 +17,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".CouponsActivity" />
+        <activity android:name=".VerifyPhoneActivity" />
+        <activity android:name=".ProfileActivity" />
     </application>
 
 </manifest>
