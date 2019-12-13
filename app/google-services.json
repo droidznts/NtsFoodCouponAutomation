@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "536066392044",
+    "firebase_url": "https://foodcouponautomation.firebaseio.com",
+    "project_id": "foodcouponautomation",
+    "storage_bucket": "foodcouponautomation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536066392044:android:0516cfb6e899a7f0aa4ac9",
+        "android_client_info": {
+          "package_name": "com.example.foodcouponautomation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "536066392044-fm5dbjuqa3c1tcair8dfetftof5o3e25.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.foodcouponautomation",
+            "certificate_hash": "a82d54c4571d399cb04de7fb39724f025d5aa477"
+          }
+        },
+        {
+          "client_id": "536066392044-nca9okmef9uiccdnffef1j15k3kno852.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAktjmb4s4QEXy62Gd36OnQT-fXK5EuQIc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "536066392044-nca9okmef9uiccdnffef1j15k3kno852.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
