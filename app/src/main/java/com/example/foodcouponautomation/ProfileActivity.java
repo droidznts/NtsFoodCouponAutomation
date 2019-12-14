@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,8 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -29,7 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 import in.myinnos.androidscratchcard.ScratchCard;
 
@@ -50,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     int hour;
     TextView tvTypeOfFood, tvTiming;
     CardView cardCoupon;
+    ImageView ivRating;
 
     String bfStartTime;
     String bfEndTime;
@@ -59,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
     String dinStartTime;
     String dinEndTime;
+    TextView tvDate;
 
     QueryDocumentSnapshot userDetails;
     Button adminOps;
@@ -66,6 +75,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     private final static int LUNCH = 1;
     private final static int DINNER = 2;
     private final static int DEFAULT_NO_COUPON = 2;
+
+    String mealConsumptionQuery = "";
 
     private int currentTimeFood = -1;
 
@@ -77,6 +88,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         currentTimeCal = Calendar.getInstance();
         hourOfTheDay = currentTimeCal.get(Calendar.HOUR_OF_DAY);
         hour = currentTimeCal.get(Calendar.HOUR);
+
 
         // get saved phone number
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("USER_PREF",
@@ -92,10 +104,12 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         tvTiming = findViewById(R.id.tvTiming);
         adminOps = findViewById(R.id.adminOps);
         cardCoupon = findViewById(R.id.cardCoupon);
+        ivRating = findViewById(R.id.ivRating);
+        tvDate = findViewById(R.id.tvDate);
         tvScratch = findViewById(R.id.scratch_text);
 
         getMealTimeTable();
-        getUserDetails();
+
 
 
         findViewById(R.id.buttonLogout).setOnClickListener(new View.OnClickListener() {
@@ -123,6 +137,15 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
             @Override
             public void onClick(View v) {
                 updateUserDatabase();
+//                showDialog();
+
+            }
+        });
+
+
+        ivRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 showDialog();
 
             }
@@ -149,6 +172,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
                                 try {
                                     updateCouponAccordingTime();
+
+
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
@@ -166,39 +191,53 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     private void updateCouponAccordingTime() throws ParseException {
 
 
-        if (currentTimeCal.get(Calendar.AM_PM) == Calendar.PM) {
-            tvTiming.setText((hour + ":" + Calendar.MINUTE + " PM"));
+        tvDate.setText(currentTimeCal.get(Calendar.DAY_OF_MONTH)+"/"+currentTimeCal.get(Calendar.MONTH)+"/"+currentTimeCal.get(Calendar.YEAR));
+        if(currentTimeCal.get(Calendar.AM_PM) == Calendar.PM){
+            tvTiming.setText((hour+":"+currentTimeCal.get(Calendar.MINUTE) +" PM"));
 
-        } else {
-            tvTiming.setText((hour + ":" + Calendar.MINUTE + " AM"));
+        }else {
+            tvTiming.setText((hour+":"+currentTimeCal.get(Calendar.MINUTE)+" AM"));
         }
 
 
-        if (isTimeBetween(bfStartTime, bfEndTime)) {
+        if(hourOfTheDay>=7 && hourOfTheDay<=9){
 
             tvTypeOfFood.setText("Breakfast");
             cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.bf_blue));
             currentTimeFood = BF;
+            mealConsumptionQuery = "bf_coupn";
 
-        } else if (isTimeBetween(lunStartTime, lunEndTime)) {
+        }else if(hourOfTheDay >= 12 && hourOfTheDay <= 15){
             tvTypeOfFood.setText("Lunch");
             cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.lunch_yellow));
 
             currentTimeFood = LUNCH;
+            mealConsumptionQuery = "lun_coupn";
 
 
-        } else if (isTimeBetween(dinStartTime, dinEndTime)) {
+
+        }else if(hourOfTheDay >= 20 && hourOfTheDay <= 23){
             tvTypeOfFood.setText("Dinner");
             cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.dinner_pink));
 
             currentTimeFood = DINNER;
+            mealConsumptionQuery = "dine_coupn";
 
-        } else {
+
+        }else {
             tvTypeOfFood.setText("No Coupon");
             redeemButton.setVisibility(View.INVISIBLE);
             currentTimeFood = DEFAULT_NO_COUPON;
 
         }
+
+
+        getUserDetails();
+
+
+
+
+
 
 
     }
@@ -280,46 +319,88 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
+                        if(task.isSuccessful()){
 
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-
-
-                                userDetails = document;
-                                Log.i(TAG + " Tag ", String.valueOf(document.getData()));
-                                Log.i(TAG + " Tag lunch", String.valueOf(document.getData().get("lun_coupn")));
-                                Log.i(TAG + " Tag dinner", String.valueOf(document.getData().get("dine_coupn")));
-                                Log.i(TAG + " Tag uid", String.valueOf(document.getData().get("uid")));
+                                for (QueryDocumentSnapshot document : task.getResult()) {
 
 
+                                    userDetails = document;
+                                    Log.i(TAG +" Tag ", String.valueOf(document.getData()));
+                                    Log.i(TAG +" Tag lunch", String.valueOf(document.getData().get("lun_coupn")));
+                                    Log.i(TAG +" Tag dinner", String.valueOf(document.getData().get("dine_coupn")));
+                                    Log.i(TAG +" Tag uid", String.valueOf(document.getData().get("uid")));
 
-                                if (!document.getData().get("role").equals("admin")) {
-                                    adminOps.setVisibility(View.INVISIBLE);
+
+                                    if(!document.getData().get("role").equals("admin")){
+                                        adminOps.setVisibility(View.INVISIBLE);
+                                    }
+
+
+                                    if(currentTimeFood == BF){
+
+                                        if((Long) document.getData().get("bf_coupn") == 0){
+                                            redeemButton.setVisibility(View.INVISIBLE);
+                                        }
+
+                                    }else if(currentTimeFood == LUNCH)
+                                    {
+                                        if((Long) document.getData().get("lun_coupn") == 0){
+                                            redeemButton.setVisibility(View.INVISIBLE);
+                                        }
+
+                                    }else if(currentTimeFood == DINNER){
+                                        if((Long) document.getData().get("dine_coupn") == 0){
+                                            redeemButton.setVisibility(View.INVISIBLE);
+                                        }
+
+                                    }else {
+
+                                            redeemButton.setVisibility(View.INVISIBLE);
+                                    }
+
+
                                 }
 
 
-                                if (currentTimeFood == BF) {
+                            db.collection("meal_consumption_details").whereEqualTo("uid",uid).get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if(task.isSuccessful()){
 
-                                    if ((Long) document.getData().get("bf_coupn") == 0) {
-                                        redeemButton.setVisibility(View.GONE);
-                                    }
 
-                                } else if (currentTimeFood == LUNCH) {
-                                    if ((Long) document.getData().get("lun_coupn") == 0) {
-                                        redeemButton.setVisibility(View.GONE);
-                                    }
+                                                for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                } else if (currentTimeFood == DINNER) {
-                                    if ((Long) document.getData().get("dine_coupn") == 0) {
-                                        redeemButton.setVisibility(View.GONE);
-                                    }
+//                                                    Log.i(TAG, " meal consumption" + document.get(mealConsumptionQuery).toString());
+                                                    Log.i(TAG, " meal consumption" + document.get("lun_coupn").toString());
+                                                    Log.i(TAG, " dine consumption" + document.get("dine_coupn").toString());
 
-                                } else {
 
-                                    redeemButton.setVisibility(View.GONE);
-                                }
+                                                    Log.i(TAG, " current time " + currentTimeCal.get(Calendar.DAY_OF_MONTH));
+                                                    Log.i(TAG, " current time " + currentTimeCal.get(Calendar.MONTH));
+                                                    Log.i(TAG, " current time " + currentTimeCal.get(Calendar.YEAR));
 
-                            }
+
+                                                }
+                                            }
+                                        }
+                                    });
+
+
+
+
+
+
+
+
+
+                            Log.i(TAG, String.valueOf(task.getResult().getDocuments().size()));
+                                Log.i(TAG +" Tag", String.valueOf(currentTimeCal.get(Calendar.HOUR_OF_DAY)));
+                                Log.i(TAG +" Tag", String.valueOf(task.getResult()));
+                                Log.i(TAG +" Tag", String.valueOf(task.getResult().getDocuments()));
+                                Log.i(TAG +" Tag", String.valueOf(task.getResult().getQuery().get()));
+                                Log.i(TAG +" Tag", String.valueOf(task.getResult().getDocuments()));
+//                                Log.i(TAG +" Tag", String.valueOf(task.getResult().getDocuments().get(0)));
 
 
                         }
@@ -371,11 +452,36 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
     private void updateUserDatabase() {
 
+       /* db.collection("meal_consumption_details").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                queryDocumentSnapshots.getDocuments().get(0)
+            }
+        });*/
+
+        db.collection("meal_consumption_details").whereEqualTo("uid",uid).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+
+
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                Log.i(TAG, " meal consumption" + document.get(mealConsumptionQuery));
+                                Log.i(TAG, " meal consumption" + document.get("lun_coupn"));
+                                Log.i(TAG, " current time " + currentTimeCal.get(Calendar.DAY_OF_MONTH));
+                            }
+                        }
+                    }
+                });
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_signout, menu);
+        getMenuInflater().inflate(R.menu.menu_signout,menu);
         return true;
     }
 }

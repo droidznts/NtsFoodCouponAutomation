@@ -74,6 +74,19 @@
                     android:layout_below="@+id/tvTypeOfFood"/>
 
                 <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textColor="@android:color/black"
+                    android:textSize="10sp"
+                    android:gravity="center"
+                    android:padding="2dp"
+                    android:layout_below="@+id/tvTiming"/>
+
+
+
+                <TextView
                     android:id="@+id/redeemButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,13 +103,26 @@
                     android:minHeight="0dp"
                     android:textColor="@android:color/white"
                     android:background="@drawable/rounded_corner"
-                    android:layout_below="@+id/tvTiming"/>
+                    android:layout_below="@+id/tvDate"/>
+
+
+                <ImageView
+                    android:id="@+id/ivRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/redeemButton"
+                    android:layout_alignParentRight="true"
+                    android:layout_margin="5dp"
+                    android:layout_below="@id/tvTiming"
+                    android:src="@drawable/ic_rate_review_black_24dp"/>
+
 
 
                 <in.myinnos.androidscratchcard.ScratchCard
                     android:id="@+id/scratch"
-                    android:layout_width="wrap_content"
+                    android:layout_width="250dp"
                     android:layout_height="200dp"
+                    android:layout_centerHorizontal="true"/>
                     android:layout_alignStart="@+id/scratch_text"
                     android:layout_marginStart="-53dp"
                     app:scratchDrawable="@drawable/coupon" />
