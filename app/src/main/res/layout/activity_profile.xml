@@ -109,18 +109,6 @@
                     android:layout_below="@+id/tvDate"/>
 
 
-                <ImageView
-                    android:id="@+id/ivRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@+id/redeemButton"
-                    android:layout_alignParentRight="true"
-                    android:layout_margin="5dp"
-                    android:layout_below="@id/tvTiming"
-                    android:src="@drawable/ic_rate_review_black_24dp"/>
-
-
-
                 <in.myinnos.androidscratchcard.ScratchCard
                     android:id="@+id/scratch"
                     android:layout_width="wrap_content"
@@ -136,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
-                    android:text="Scratch Ur Coupon 🍛"
+                    android:text="Scratch Coupon 🍛"
                     android:textSize="18sp"
                     android:paddingStart="65dp"
                     android:textStyle="bold|italic"
@@ -150,7 +138,16 @@
 
         </androidx.cardview.widget.CardView>
 
-
+        <ImageView
+            android:id="@+id/ivRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_alignBottom="@+id/redeemButton"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:layout_below="@id/tvTiming"
+            android:src="@drawable/rating"/>
 
 
         <androidx.appcompat.widget.AppCompatButton
@@ -160,6 +157,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/btn_rounded_blue"
             android:text="Admin Ops"
+            android:visibility="invisible"
             android:textColor="@android:color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
