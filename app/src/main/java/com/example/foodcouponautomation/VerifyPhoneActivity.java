@@ -57,6 +57,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
         buttonSignIn = findViewById(R.id.buttonSignIn);
 
         String phoneNumber = getIntent().getStringExtra("phoneNumber");
+        String name = getIntent().getStringExtra("name");
         documentId = getIntent().getStringExtra("docId");
         sendVerificationCode(phoneNumber);
 
@@ -64,6 +65,7 @@ public class VerifyPhoneActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("phoneNumber", phoneNumber);
+        editor.putString("name", name);
         editor.apply();
 
         editText.setOnEditorActionListener(new EditText.OnEditorActionListener() {

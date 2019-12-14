@@ -12,28 +12,31 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:background="@drawable/user"
-            android:foregroundGravity="center" />
+        <com.mikhaellopez.circularimageview.CircularImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/norman"
+            app:civ_border_color="@color/red_400"
+            app:civ_border_width="4dp"
+            app:civ_shadow="true"
+            app:civ_shadow_radius="10"
+            app:civ_shadow_color="@color/red_300"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="Welcome"
+            android:text="Waste Not What the Earth give us"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
             android:textColor="@color/grey_80"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/mobileNumber"
+            android:id="@+id/name"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:gravity="center"
-            android:text="Number"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Subhead"
             android:textColor="@color/grey_60" />
 

@@ -83,10 +83,12 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             boolean isMobileNoPresent = false;
                             String docId = "";
+                            String name = "";
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.i(TAG, document.getId() + " => " + document.getData());
                                 isMobileNoPresent = true;
                                 docId = document.getId();
+                                name = document.get("name").toString();
                             }
 
                             if (isMobileNoPresent) {
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
                                 Intent intent = new Intent(MainActivity.this, VerifyPhoneActivity.class);
                                 intent.putExtra("phoneNumber", phoneNumber);
                                 intent.putExtra("docId", docId);
+                                intent.putExtra("name", name);
                                 startActivity(intent);
                             } else {
                                 editTextPhone.setError("Your number is not present");

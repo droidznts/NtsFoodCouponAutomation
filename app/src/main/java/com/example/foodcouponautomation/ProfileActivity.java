@@ -17,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -48,8 +46,8 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
 public class ProfileActivity extends AppCompatActivity implements RatingDialogListener {
 
     private static final String TAG = ProfileActivity.class.getCanonicalName();
-    String phoneNumber;
-    TextView mobileNumber;
+    String userName;
+    TextView name;
     TextView redeemButton;
     TextView tvScratch;
     ScratchCard scratch;
@@ -96,11 +94,11 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         // get saved phone number
         SharedPreferences prefs = getApplicationContext().getSharedPreferences("USER_PREF",
                 Context.MODE_PRIVATE);
-        phoneNumber = prefs.getString("phoneNumber", NULL);
+        userName = prefs.getString("name", NULL);
         uid = prefs.getString("uid", NULL);
 
-        mobileNumber = findViewById(R.id.mobileNumber);
-        mobileNumber.setText(phoneNumber);
+        name = findViewById(R.id.name);
+        name.setText("Hi! " + userName);
         redeemButton = findViewById(R.id.redeemButton);
         scratch = findViewById(R.id.scratch);
         tvTypeOfFood = findViewById(R.id.tvTypeOfFood);
