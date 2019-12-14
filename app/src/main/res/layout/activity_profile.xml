@@ -93,12 +93,28 @@
                     android:layout_below="@+id/tvTiming"/>
 
 
-
                 <in.myinnos.androidscratchcard.ScratchCard
                     android:id="@+id/scratch"
-                    android:layout_width="250dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="200dp"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_alignStart="@+id/scratch_text"
+                    android:layout_marginStart="-53dp"
+                    app:scratchDrawable="@drawable/coupon" />
+
+
+                <TextView
+                    android:id="@+id/scratch_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Scratch Ur Coupon 🍛"
+                    android:textSize="18sp"
+                    android:paddingStart="65dp"
+                    android:textStyle="bold|italic"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Title"
+                    android:textColor="@android:color/holo_red_light"
+                    />
+
 
             </RelativeLayout>
 

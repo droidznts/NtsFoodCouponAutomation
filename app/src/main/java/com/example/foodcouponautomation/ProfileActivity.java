@@ -41,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     String phoneNumber;
     TextView mobileNumber;
     TextView redeemButton;
+    TextView tvScratch;
     ScratchCard scratch;
     FirebaseFirestore db;
     String uid;
@@ -91,6 +92,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         tvTiming = findViewById(R.id.tvTiming);
         adminOps = findViewById(R.id.adminOps);
         cardCoupon = findViewById(R.id.cardCoupon);
+        tvScratch = findViewById(R.id.scratch_text);
 
         getMealTimeTable();
         getUserDetails();
@@ -112,6 +114,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
             public void onScratch(ScratchCard scratchCard, float visiblePercent) {
                 if (visiblePercent > 0.3) {
                     scratch.setVisibility(View.INVISIBLE);
+                    tvScratch.setVisibility(View.INVISIBLE);
                 }
             }
         });
