@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -49,6 +50,16 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     int hourOfTheDay;
     int hour;
     TextView tvTypeOfFood,tvTiming;
+    CardView cardCoupon;
+
+    QueryDocumentSnapshot userDetails;
+    Button adminOps;
+    private final static int BF = 0;
+    private final static int LUNCH = 1;
+    private final static int DINNER = 2;
+    private final static int DEFAULT_NO_COUPON = 2;
+
+    private int currentTimeFood = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +82,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         scratch = findViewById(R.id.scratch);
         tvTypeOfFood  =findViewById(R.id.tvTypeOfFood);
         tvTiming = findViewById(R.id.tvTiming);
+        adminOps = findViewById(R.id.adminOps);
+        cardCoupon = findViewById(R.id.cardCoupon);
 
 
 //        Log.i(TAG +" Tag", String.valueOf(currentTime.get(Calendar.HOUR)));
@@ -130,18 +143,27 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         if(hourOfTheDay>=7 && hourOfTheDay<=9){
 
             tvTypeOfFood.setText("Breakfast");
+            cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.bf_blue));
+            currentTimeFood = BF;
 
         }else if(hourOfTheDay >= 12 && hourOfTheDay <= 15){
             tvTypeOfFood.setText("Lunch");
+            cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.lunch_yellow));
+
+            currentTimeFood = LUNCH;
 
 
         }else if(hourOfTheDay >= 20 && hourOfTheDay <= 23){
             tvTypeOfFood.setText("Dinner");
+            cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.dinner_pink));
 
+            currentTimeFood = DINNER;
 
         }else {
             tvTypeOfFood.setText("No Coupon");
             redeemButton.setVisibility(View.INVISIBLE);
+            currentTimeFood = DEFAULT_NO_COUPON;
+
         }
 
 
@@ -190,11 +212,51 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                         if(task.isSuccessful()){
 
                                 for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.i(TAG +" Tag", String.valueOf(document.getData()));
-                                    Log.i(TAG +" Tag", String.valueOf(document.getData().get("lun_coupn")));
-                                    Log.i(TAG +" Tag", String.valueOf(document.getData().get("dine_coupn")));
+
+
+                                    userDetails = document;
+                                    Log.i(TAG +" Tag ", String.valueOf(document.getData()));
+                                    Log.i(TAG +" Tag lunch", String.valueOf(document.getData().get("lun_coupn")));
+                                    Log.i(TAG +" Tag dinner", String.valueOf(document.getData().get("dine_coupn")));
+                                    Log.i(TAG +" Tag uid", String.valueOf(document.getData().get("uid")));
+
+
+                                    if(!document.getData().get("role").equals("admin")){
+                                        adminOps.setVisibility(View.INVISIBLE);
+                                    }
+
+
+                                    if(currentTimeFood == BF){
+
+                                        if((Long) document.getData().get("bf_coupn") == 0){
+                                            redeemButton.setVisibility(View.GONE);
+                                        }
+
+                                    }else if(currentTimeFood == LUNCH)
+                                    {
+                                        if((Long) document.getData().get("lun_coupn") == 0){
+                                            redeemButton.setVisibility(View.GONE);
+                                        }
+
+                                    }else if(currentTimeFood == DINNER){
+                                        if((Long) document.getData().get("dine_coupn") == 0){
+                                            redeemButton.setVisibility(View.GONE);
+                                        }
+
+                                    }else {
+
+                                            redeemButton.setVisibility(View.GONE);
+                                    }
+
+
+
+
+
 
                                 }
+
+
+
 
 
 

@@ -20,4 +20,7 @@
     <color name="commentTextColor">#FFFFFF</color>
     <color name="hintTextColor">#55000000</color>
     <color name="contentTextColor">#55000000</color>
+    <color name="bf_blue">#FF1EC7DF</color>
+    <color name="lunch_yellow">#FFF8E445</color>
+    <color name="dinner_pink">#FFE91ECE</color>
 </resources>
