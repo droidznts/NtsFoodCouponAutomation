@@ -14,8 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -77,6 +80,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
         Log.i(TAG +" Tag", String.valueOf(currentTimeCal.get(Calendar.HOUR_OF_DAY)));
 
 
+        updateCouponAccordingTime();
+
 
         getUserDetails();
 
@@ -110,6 +115,36 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
             }
         });
+    }
+
+    private void updateCouponAccordingTime() {
+
+        if(currentTimeCal.get(Calendar.AM_PM) == Calendar.PM){
+            tvTiming.setText((hour+":"+ Calendar.MINUTE+" PM"));
+
+        }else {
+            tvTiming.setText((hour+":"+Calendar.MINUTE+" AM"));
+        }
+
+
+        if(hourOfTheDay>=7 && hourOfTheDay<=9){
+
+            tvTypeOfFood.setText("Breakfast");
+
+        }else if(hourOfTheDay >= 12 && hourOfTheDay <= 15){
+            tvTypeOfFood.setText("Lunch");
+
+
+        }else if(hourOfTheDay >= 20 && hourOfTheDay <= 23){
+            tvTypeOfFood.setText("Dinner");
+
+
+        }else {
+            tvTypeOfFood.setText("No Coupon");
+            redeemButton.setVisibility(View.INVISIBLE);
+        }
+
+
     }
 
     private void getUserDetails() {
@@ -162,30 +197,6 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                                 }
 
 
-                                if(currentTimeCal.get(Calendar.AM_PM) == 1){
-                                    tvTiming.setText((hour+":"+ Calendar.MINUTE+" PM"));
-
-                                }else {
-                                    tvTiming.setText((hour+":"+Calendar.MINUTE+" AM"));
-
-                                }
-
-                                if(hourOfTheDay>=7 && hourOfTheDay<=9){
-
-                                    tvTypeOfFood.setText("Breakfast");
-
-                                }else if(hourOfTheDay >= 12 && hourOfTheDay <= 15){
-                                    tvTypeOfFood.setText("Lunch");
-
-
-                                }else if(hourOfTheDay >= 20 && hourOfTheDay <= 23){
-                                    tvTypeOfFood.setText("Dinner");
-
-
-                                }else {
-                                    tvTypeOfFood.setText("No Coupon");
-                                    redeemButton.setVisibility(View.INVISIBLE);
-                                }
 
 
 
