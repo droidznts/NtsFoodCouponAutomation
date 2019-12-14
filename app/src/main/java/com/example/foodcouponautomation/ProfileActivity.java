@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,7 +37,9 @@ import java.util.Arrays;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import in.myinnos.androidscratchcard.ScratchCard;
 
@@ -191,7 +194,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
     private void updateCouponAccordingTime() throws ParseException {
 
 
-        tvDate.setText(currentTimeCal.get(Calendar.DAY_OF_MONTH)+"/"+currentTimeCal.get(Calendar.MONTH)+"/"+currentTimeCal.get(Calendar.YEAR));
+        int month = currentTimeCal.get(Calendar.MONTH) + 1;
+        tvDate.setText(currentTimeCal.get(Calendar.DAY_OF_MONTH)+"/"+month+"/"+currentTimeCal.get(Calendar.YEAR));
         if(currentTimeCal.get(Calendar.AM_PM) == Calendar.PM){
             tvTiming.setText((hour+":"+currentTimeCal.get(Calendar.MINUTE) +" PM"));
 
@@ -206,6 +210,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
             cardCoupon.setCardBackgroundColor(getResources().getColor(R.color.bf_blue));
             currentTimeFood = BF;
             mealConsumptionQuery = "bf_coupn";
+            redeemButton.setVisibility(View.VISIBLE);
+
 
         }else if(hourOfTheDay >= 12 && hourOfTheDay <= 15){
             tvTypeOfFood.setText("Lunch");
@@ -213,6 +219,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
             currentTimeFood = LUNCH;
             mealConsumptionQuery = "lun_coupn";
+            redeemButton.setVisibility(View.VISIBLE);
 
 
 
@@ -222,6 +229,7 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
             currentTimeFood = DINNER;
             mealConsumptionQuery = "dine_coupn";
+            redeemButton.setVisibility(View.VISIBLE);
 
 
         }else {
@@ -338,25 +346,33 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
                                     if(currentTimeFood == BF){
 
-                                        if((Long) document.getData().get("bf_coupn") == 0){
+                                    /*    if((Long) document.getData().get("bf_coupn") == 0){
                                             redeemButton.setVisibility(View.INVISIBLE);
-                                        }
+
+                                        }*/
+                                        boolean isCouponPresent = (Long) document.getData().get("bf_coupn") > 0;
+                                        redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+
 
                                     }else if(currentTimeFood == LUNCH)
                                     {
-                                        if((Long) document.getData().get("lun_coupn") == 0){
+                                        boolean isCouponPresent = (Long) document.getData().get("lun_coupn") > 0;
+                                        redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        /*if((Long) document.getData().get("lun_coupn") == 0){
                                             redeemButton.setVisibility(View.INVISIBLE);
-                                        }
+                                        }*/
 
                                     }else if(currentTimeFood == DINNER){
-                                        if((Long) document.getData().get("dine_coupn") == 0){
+                                        boolean isCouponPresent = (Long) document.getData().get("dine_coupn") > 0;
+                                        redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        /*if((Long) document.getData().get("dine_coupn") == 0){
                                             redeemButton.setVisibility(View.INVISIBLE);
-                                        }
+                                        }*/
 
-                                    }else {
+                                    }/*else {
 
                                             redeemButton.setVisibility(View.INVISIBLE);
-                                    }
+                                    }*/
 
 
                                 }
@@ -370,6 +386,19 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
 
                                                 for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                                    boolean isCouponAvailable = false;
+
+                                                    if(document.get(mealConsumptionQuery).toString().equalsIgnoreCase("false")){
+                                                        redeemButton.setVisibility(View.VISIBLE);
+                                                    }else {
+                                                        redeemButton.setVisibility(View.INVISIBLE);
+
+                                                    }
+
+
+
+
 
 //                                                    Log.i(TAG, " meal consumption" + document.get(mealConsumptionQuery).toString());
                                                     Log.i(TAG, " meal consumption" + document.get("lun_coupn").toString());
@@ -385,12 +414,6 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                                             }
                                         }
                                     });
-
-
-
-
-
-
 
 
 
@@ -460,7 +483,9 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
             }
         });*/
 
-        db.collection("meal_consumption_details").whereEqualTo("uid",uid).get()
+
+        final CollectionReference meal_consumption_details = db.collection("meal_consumption_details");
+        meal_consumption_details.whereEqualTo("uid",uid).get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -469,9 +494,53 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
+
+                                boolean isCouponUsed = false;
+
+                                final CollectionReference users = db.collection("users");
+                                final CollectionReference mealConsumption = db.collection("users");
+                                Map<String, Object> mealInfo = new HashMap<>();
+
+                                mealInfo.put(mealConsumptionQuery,true);
+
+                                meal_consumption_details.document(document.getId()).update(mealInfo);
+
+
+
+                                users.whereEqualTo("uid",uid).get().addOnCompleteListener(
+                                        new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                                                if(task.isSuccessful()){
+
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                                        final CollectionReference mealConsumption = db.collection("users");
+                                                        Map<String, Object> updateUSerMeal = new HashMap<>();
+
+                                                        updateUSerMeal.put(mealConsumptionQuery, ((Long)document.get(mealConsumptionQuery)-1) );
+
+                                                        users.document(document.getId()).update(updateUSerMeal);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                );
+
+
+
+
+                                redeemButton.setVisibility(View.INVISIBLE);
+
+
+
+//                                document.get(mealConsumptionQuery).toString().equalsIgnoreCase("false");
+
+//                                document.get(mealConsumptionQuery)
+//                                document.getId()
                                 Log.i(TAG, " meal consumption" + document.get(mealConsumptionQuery));
                                 Log.i(TAG, " meal consumption" + document.get("lun_coupn"));
-                                Log.i(TAG, " current time " + currentTimeCal.get(Calendar.DAY_OF_MONTH));
                             }
                         }
                     }
