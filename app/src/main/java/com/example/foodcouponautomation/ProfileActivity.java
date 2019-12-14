@@ -234,6 +234,8 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
             tvTypeOfFood.setText("No Coupon");
             redeemButton.setVisibility(View.INVISIBLE);
             currentTimeFood = DEFAULT_NO_COUPON;
+            scratch.setVisibility(View.INVISIBLE);
+            tvScratch.setVisibility(View.INVISIBLE);
 
         }
 
@@ -350,12 +352,19 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                                         }*/
                                         boolean isCouponPresent = (Long) document.getData().get("bf_coupn") > 0;
                                         redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        scratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        tvScratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+
 
 
                                     }else if(currentTimeFood == LUNCH)
                                     {
                                         boolean isCouponPresent = (Long) document.getData().get("lun_coupn") > 0;
                                         redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        scratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        tvScratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+
+
                                         /*if((Long) document.getData().get("lun_coupn") == 0){
                                             redeemButton.setVisibility(View.INVISIBLE);
                                         }*/
@@ -363,6 +372,10 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
                                     }else if(currentTimeFood == DINNER){
                                         boolean isCouponPresent = (Long) document.getData().get("dine_coupn") > 0;
                                         redeemButton.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        scratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+                                        tvScratch.setVisibility(isCouponPresent ? View.VISIBLE : View.INVISIBLE);
+
+
                                         /*if((Long) document.getData().get("dine_coupn") == 0){
                                             redeemButton.setVisibility(View.INVISIBLE);
                                         }*/
@@ -389,8 +402,16 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
                                                     if(document.get(mealConsumptionQuery).toString().equalsIgnoreCase("false")){
                                                         redeemButton.setVisibility(View.VISIBLE);
+                                                        scratch.setVisibility( View.VISIBLE);
+                                                        tvScratch.setVisibility(View.VISIBLE);
+
+
                                                     }else {
                                                         redeemButton.setVisibility(View.INVISIBLE);
+                                                        scratch.setVisibility( View.INVISIBLE);
+                                                        tvScratch.setVisibility(View.INVISIBLE);
+
+
 
                                                     }
 
@@ -530,6 +551,9 @@ public class ProfileActivity extends AppCompatActivity implements RatingDialogLi
 
 
                                 redeemButton.setVisibility(View.INVISIBLE);
+
+                                scratch.setVisibility( View.INVISIBLE);
+                                tvScratch.setVisibility(View.INVISIBLE);
 
 
 
